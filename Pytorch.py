@@ -12,7 +12,6 @@ x = torch.rand_like(x,dtype = torch.float64)
 
 print(x.size()[0:]) #torch.size()是一个tuple,支持tuple操作，获取tensor形状也可使用print(x.shape)
 
-
 '''
 #算术操作
 #test1:
@@ -88,9 +87,26 @@ b = torch.from_numpy(a)
 print(b)
 '''
 
-#张量的求导
-x = torch.ones(2,2,requires_grad=True)#requires_grad用于追踪函数求导
+#requires_grad用于追踪函数求导
+'''
+x = torch.ones(2,2,requires_grad=True)
 y = x + 1
 print(y)
-print(y.grad_fn)
+print(x.grad_fn) # x直接创建为叶子节点
+print(y.grad_fn)# 创建加法操作<AddBackward0 object at 0x0000028C262D6970> 
+print(x.is_leaf,y.is_leaf)
+'''
 
+#复杂的操作
+'''
+z = y*y*3
+out = z.mean()# mean函数用于取均值
+print(z,out)
+'''
+#梯度
+'''
+x = torch.ones(3,3).requires_grad_(True)
+t = x*2
+t.backward(torch.ones_like(t))
+print(x.grad)
+'''
