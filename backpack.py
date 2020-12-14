@@ -1,34 +1,71 @@
-def pack1(w, v, C): #每个东西只能选择一次
-    dp = [[0 for _ in range(C+1)] for _ in range(len(w)+1)]
-    for i in range(1, len(w)+1):
-        for j in range(1, C+1):
-            if j < w[i-1]: #如果剩余容量不够新来的物体 直接等于之前的
-                dp[i][j] = dp[i-1][j]
-            else:
-                dp[i][j] = max(dp[i-1][j], dp[i-1][j-w[i-1]]+ v[i-1])
-    return dp[len(w)][C]
+import numpy as np
 
-def backpack(n,v):
-    goods = []
-    for i in range(n):
-        goods.append([int(i) for i in input().split()])
+n, c = map(int, input().split())
+weight = [int(n) for n in input().split()]
+value = [int(n) for n in input().split()]
+flag = np.full(len(value), False)
+bestV = 0
+bestX = flag
+cv = 0
+cw = 0
 
-    dp = [0 for i in range(n+1)]
+#动态规划
+def backpack(n,c):
+    dp = [0 for i in range(c+1)]
     for i in range(n):
-        for j in range(v,-1,-1):
-            dp[j] = max(dp[j-1],dp[j-goods[i][0]]+goods[i][1])
+        for j in range(c,-1,-1): # 从后往前
+            if j >= weight[i]:
+                dp[j] = max(dp[j], dp[j-weight[i]] + value[i])
+
     print(dp[-1])
 
 
-n, v = map(int, input().split())
-weight = [int(n) for n in input().split()]
-value = [int(n) for n in input().split()]
+#回溯法
+def back(k):
+    global cv, cw, bestV
+    if k >= len(value):
+        if cv > bestV:
+            for i in range(1, len(value)):
+                bestX[i] = flag[i]
+            bestV = cv
+            return
 
-dp = [0 for i in range(v+1)]
+    if cw + weight[k] <= c:    #判断左子树是否符合条件
+        flag[k] = True
+        cw += weight[k]
+        cv += value[k]
+        back(k+1)
+        cv -= value[k]
+        cw -= weight[k]
 
-for i in range(n):
-    for j in range(v,-1,-1): # 从后往前
-        if j >= weight[i]:
-            dp[j] = max(dp[j], dp[j-weight[i]] + value[i])
+    if (bound(k+1, cv) > bestV):   #右子树
+        flag[k] = False
+        back(k+1)
 
-print(dp[-1])
+
+#限界条件（剩余物品价值与当前价值的总和大于最优解）
+def bound(k,cv):
+    rv = 0
+    while(k<len(value)):
+        rv += value[k]
+        k+=1
+    return cv + rv
+
+
+#按密度对于物品重排序
+def sort_by_pw(weight,value,n):
+    for i in range(n):
+        for j in range(i+1,n,1):
+            if (value[i]/weight[i])<(value[j]/weight[j]):
+                value[i],value[j] = value[j],value[i]
+                weight[i],weight[j] = weight[j],weight[i]
+
+
+if __name__ == "__main__":
+   sort_by_pw(weight,value,n)
+   print(weight)
+   print(value)
+
+
+
+
