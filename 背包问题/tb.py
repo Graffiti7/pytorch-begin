@@ -9,23 +9,11 @@ bestX = flag
 cv = 0
 cw = 0
 
-#动态规划
-def backpack(n,c):
-    dp = [0 for i in range(c+1)]
-    for i in range(n):
-        for j in range(c,-1,-1): # 从后往前
-            if j >= weight[i]:
-                dp[j] = max(dp[j], dp[j-weight[i]] + value[i])
-
-    print(dp[-1])
-
-
-#回溯法
-def back(k):
-    global cv, cw, bestV
-    if k >= len(value):
+def backpack(k):
+    global cv, cw, bestV 
+    if k > n-1:
         if cv > bestV:
-            for i in range(1, len(value)):
+            for i in range(0, n):
                 bestX[i] = flag[i]
             bestV = cv
             return
@@ -34,23 +22,35 @@ def back(k):
         flag[k] = True
         cw += weight[k]
         cv += value[k]
-        back(k+1)
-        cv -= value[k]
+        backpack(k+1)
         cw -= weight[k]
-
+        cv -= value[k]
     if (bound(k+1, cv) > bestV):   #右子树
         flag[k] = False
-        back(k+1)
-
+        backpack(k+1)
 
 #限界条件（剩余物品价值与当前价值的总和大于最优解）
 def bound(k,cv):
     rv = 0
-    while(k<len(value)):
+    while(k<n):
         rv += value[k]
         k+=1
     return cv + rv
-
+#限界条件（剩余物品连续背包处理的结果作为上界）
+def bound_profit(k,cv):
+    rv = 0
+    rw = 0
+    for i in range(k,n):
+        if weight[i]<=c - (cw + rw):
+            rw += weight[i]
+            rv += value[i]
+        else:
+            if c-(cw + rw)!=0:
+                rv += (weight[i]/value[i])*(c - (cw + rw))
+                rw == c -cw
+            else:
+                break
+    return cv + rv
 
 #按密度对于物品重排序
 def sort_by_pw(weight,value,n):
@@ -60,12 +60,7 @@ def sort_by_pw(weight,value,n):
                 value[i],value[j] = value[j],value[i]
                 weight[i],weight[j] = weight[j],weight[i]
 
-
 if __name__ == "__main__":
-   sort_by_pw(weight,value,n)
-   print(weight)
-   print(value)
-
-
-
-
+    sort_by_pw(weight,value,n)
+    backpack(0)
+    print(bestV)
