@@ -9,7 +9,6 @@ def knn(trainData,testData,labels,k):
     sqrDiffSum = sqrDiff.sum(axis = 1)
     distance = sqrDiffSum**0.5
     sortDistance = distance.argsort()
-
     count = {}
 
     for i in range(k):

@@ -1,5 +1,5 @@
 import numpy as np
-import random
+
 
 scores = np.array([[1,2,3],
                     [4,5,6]],dtype=np.int64)
@@ -13,3 +13,4 @@ print(scores.size)
 print(scores.dtype)
 #元素字节大小
 print(scores.itemsize)
+print(scores.__add__(1))
